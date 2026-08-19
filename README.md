@@ -47,7 +47,7 @@ routes/web.php                → routing terpisah per role (admin/karyawan)
 
 1. **Clone repo ini**
    ```bash
-   git clone https://github.com/USERNAME/absensi-app.git
+   git clone https://github.com/anwar-iman21/absensi-app.git
    cd absensi-app
    ```
 
