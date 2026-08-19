@@ -1,62 +1,54 @@
-# SIM PKL Laduny
+# Absensi App
 
-**Sistem Informasi Manajemen PKL (Praktik Kerja Lapangan)** — aplikasi berbasis web untuk mengelola kegiatan PKL/magang siswa, mulai dari absensi, jurnal harian, penilaian, hingga monitoring ibadah, dengan dua peran pengguna: **Admin** dan **Siswa**.
+**Sistem Absensi Karyawan Digital** — aplikasi berbasis web untuk mengelola kehadiran karyawan menggunakan QR Code/Barcode, lengkap dengan manajemen shift, cuti/izin, dan penggajian (payroll), dengan dua peran pengguna: **Admin** dan **Karyawan**.
 
 ## ✨ Fitur
 
 ### 👤 Admin
-- **Master Data** — kelola Sekolah, Jurusan, Batch, Lokasi PKL, dan Kelompok
-- **Manajemen Siswa** — CRUD data siswa peserta PKL, termasuk cetak kartu peserta
-- **Absensi** — pantau, setujui, atau tolak absensi & pengajuan izin siswa
-- **Monitoring Ibadah** — approve/reject laporan ibadah siswa, lengkap dengan rekap
-- **Jurnal Harian** — review dan verifikasi jurnal kegiatan siswa
-- **Penilaian** — input dan kelola nilai PKL siswa
-- **Pengumuman & Pesan** — kirim pengumuman dan pesan langsung ke siswa
-- **Laporan** — ekspor laporan absensi, ibadah, jurnal, dan penilaian ke **Excel**, **CSV**, dan **PDF**
+- **Manajemen Karyawan** — CRUD data karyawan, cetak kartu ID, dan generate QR Code per karyawan
+- **Absensi** — pantau kehadiran, input absensi manual, serta scan QR/barcode untuk presensi
+- **Payroll** — generate slip gaji otomatis berdasarkan data kehadiran, tandai status selesai, dan cetak slip gaji
+- **Manajemen Cuti/Izin** — setujui atau tolak pengajuan cuti karyawan
+- **Shift** — kelola jadwal shift kerja
+- **Laporan** — ekspor laporan absensi (PDF/Excel), payroll (PDF), dan cuti
 - **Activity Log** — pantau aktivitas pengguna dalam sistem
-- **Pengaturan** — konfigurasi umum sistem
 
-### 🎓 Siswa
-- **Absensi** — presensi masuk/pulang, termasuk pengajuan izin
-- **Ibadah** — input laporan ibadah harian
-- **Jurnal Harian** — tulis dan edit jurnal kegiatan PKL
-- **Penilaian** — lihat hasil penilaian dari admin/pembimbing
-- **Pengumuman & Pesan** — baca pengumuman dan kirim/terima pesan
-- **Profil** — kelola data diri dan ubah password
+### 🧑‍💼 Karyawan
+- **Absensi** — presensi masuk/pulang lewat scan QR Code
+- **Pengajuan Cuti/Izin** — ajukan cuti dan lihat status persetujuannya
+- **Profil & QR Code** — lihat profil pribadi dan QR Code presensi masing-masing
 
 ## 🛠️ Tech Stack
 
 - **Framework:** Laravel 10
 - **PHP:** ^8.1
-- **Templating:** Blade
 - **Database:** MySQL
 - **Frontend build:** Vite
-- **Autentikasi:** Role-based middleware (Admin & Siswa)
-- **Export laporan:** Excel, CSV, PDF (custom helper: `SimpleXlsx`, `SimplePdf`)
-- **Validasi lokasi absensi:** `GeoHelper`
+- **Autentikasi:** Role-based middleware (Admin & Karyawan)
+- **QR Code / Barcode:** simplesoftwareio/simple-qrcode, milon/barcode
+- **Export laporan:** maatwebsite/excel, barryvdh/laravel-dompdf
+- **Tabel data:** yajra/laravel-datatables-oracle
 
 ## 📂 Struktur Singkat
 
 ```
 app/Http/Controllers/
   ├── Auth/                  → LoginController
-  ├── Admin/                 → controller khusus admin (Sekolah, Jurusan, Siswa, Absensi, dll.)
-  └── Siswa/                 → controller khusus siswa (Absensi, Jurnal, Penilaian, dll.)
+  ├── Admin/                 → Employee, Attendance, Payroll, Leave, Shift, Report
+  └── Karyawan/               → Dashboard, Absensi, Leave
 
-app/Models/                  → Siswa, Absensi, JurnalHarian, Penilaian, IbadahMonitoring, dll.
-app/Helpers/GeoHelper.php    → validasi lokasi untuk absensi
-app/Support/                 → SimpleXlsx.php, SimplePdf.php (util export laporan)
+app/Models/                  → Employee, Attendance, Payroll, LeaveRequest, Shift, SalaryLog, ActivityLog
 
-database/migrations/         → skema tabel: sekolah, jurusan, batch, siswa, absensi, dll.
-routes/web.php                → routing utama, dipisah per role (admin/siswa)
+database/migrations/         → skema tabel: employees, attendance, payroll, leave_requests, shifts, dll.
+routes/web.php                → routing terpisah per role (admin/karyawan)
 ```
 
 ## 🚀 Cara Menjalankan
 
 1. **Clone repo ini**
    ```bash
-   git clone https://github.com/USERNAME/sim-pkl-laduny.git
-   cd sim-pkl-laduny
+   git clone https://github.com/USERNAME/absensi-app.git
+   cd absensi-app
    ```
 
 2. **Install dependency**
@@ -72,21 +64,21 @@ routes/web.php                → routing utama, dipisah per role (admin/siswa)
    ```
 
 4. **Konfigurasi database**
-   Buka `.env`, sesuaikan bagian berikut dengan database lokal kamu:
-   ```
-   APP_URL=http://localhost:8000
-   DB_DATABASE=sim_pkl_laduny
+
+   Buka `.env`, sesuaikan dengan database lokal kamu:
+
+   ```env
+   DB_DATABASE=absensi_app
    DB_USERNAME=root
    DB_PASSWORD=
    ```
-   > Catatan: `.env.example` bawaan disetel untuk mode `production`. Untuk pengembangan lokal, ubah `APP_ENV=local` dan `APP_DEBUG=true` supaya lebih mudah melakukan debugging.
 
 5. **Jalankan migrasi (dan seeder jika tersedia)**
    ```bash
    php artisan migrate --seed
    ```
 
-6. **Buat symlink storage** (untuk file upload, jika digunakan)
+6. **Buat symlink storage** (untuk QR code/upload file)
    ```bash
    php artisan storage:link
    ```
@@ -101,7 +93,7 @@ routes/web.php                → routing utama, dipisah per role (admin/siswa)
 
 ## 📌 Catatan
 
-Project ini dikembangkan sebagai sistem manajemen PKL/magang siswa yang terintegrasi. Fitur berbasis role (Admin & Siswa) memisahkan hak akses secara jelas melalui middleware. Cocok dijadikan referensi belajar arsitektur Laravel skala menengah dengan banyak modul yang saling terhubung.
+Project ini dikembangkan sebagai sistem absensi digital yang terintegrasi dengan fitur payroll dan manajemen cuti. Pemisahan hak akses Admin & Karyawan dilakukan melalui middleware role. Cocok dijadikan referensi belajar integrasi QR Code, export laporan, dan arsitektur Laravel skala menengah.
 
 ## 📄 Lisensi
 
